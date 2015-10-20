@@ -1,9 +1,9 @@
 import random
 
 def isPrime(i):
-    for j in range(2,i):
-        if i%j==0:
-            return False
+    	for j in range(2,i):
+        	if i%j==0:
+            		return False
 	return True
 
 def Prime():
@@ -27,18 +27,18 @@ def gcd(a,b):
 	return a
 
 def egcd(a, b):
-    if a == 0:
-        return (b, 0, 1)
-    else:
-        g, y, x = egcd(b % a, a)
-        return (g, x - (b // a) * y, y)
+    	if a == 0:
+        	return (b, 0, 1)
+    	else:
+		g, y, x = egcd(b % a, a)
+        	return (g, x - (b // a) * y, y)
 
 def modinv(e, z):
-    g, x, y = egcd(e, z)
-    if g != 1:
-        raise Exception('modular inverse does not exist')
-    else:
-        return x % z
+    	g, x, y = egcd(e, z)
+    	if g != 1:
+        	raise Exception('modular inverse does not exist')
+    	else:
+        	return x % z
     	
 def encrypt(m,n,e):
 	return (m ** e)%n

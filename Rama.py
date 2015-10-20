@@ -72,7 +72,6 @@ message = raw_input()
 print "Public key: ", publicKey
 print "Private key: ", privateKey
 
-enc = []
 dec = []
 print "message: ",message
 print "encrypted value",

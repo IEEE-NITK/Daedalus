@@ -12,7 +12,7 @@ def Prime():
 	return r
 
 def Modulus(p, q):
-    n = p * q
+	n = p * q
 	return n
 
 def EulerTotientFn(p,q):

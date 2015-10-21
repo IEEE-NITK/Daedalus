@@ -1,9 +1,4 @@
 from random import *
-""" To decrypt the normal way """
-def decrypt(cipher,d,n):
-	decipher=power(cipher,d)
-	decipher=decipher%n
-	return decipher
 
 """ used to find the modular multiplicative inverse """	
 def extended_euclid_algorithm(a,b):
@@ -14,9 +9,7 @@ def extended_euclid_algorithm(a,b):
 	else:
 		large,small=extended_euclid_algorithm(b,a%b)
 		coeff_small=(a-a%b)/b
-		temp=large
-		large=small
-		small=small*coeff_small+temp
+		large,small=small,small*coeff_small+large
 		return large,small
 
 """ To decrypt using Chinese Remainder Theorem """
@@ -77,18 +70,20 @@ lower_limit=100
 upper_limit=1000
 p=randint(lower_limit,upper_limit)
 q=randint(lower_limit,upper_limit)
+
 while p%2==0 or p%3==0 or not_prime(p):
 	p=randint(lower_limit,upper_limit)
 while q%2==0 or q%3==0 or not_prime(q):
 	q=randint(lower_limit,upper_limit)
 	
-print "prime numbers are ",p
-print q
-message=randint(lower_limit,upper_limit)	
-print "Message is ",message
+encryption=dict()
+encryption["p"]=p
+encryption["q"]=q
+encryption["n"]=p*q
+
+message=raw_input("Input a message: ")
 n=p*q
 totient=(p-1)*(q-1)
-print "totient is ",totient
 for i in range(3,totient):
 	coprime=1
 	if(gcd(i,totient)!=1):
@@ -96,16 +91,23 @@ for i in range(3,totient):
 	if(coprime==1):
 		break
 e=i
-print "e is ",e
+encryption["e"]=e
+encryption["totient"]=totient
+
 large,small=extended_euclid_algorithm(totient,e)
 if(small*e)%totient==1:
 	d=small
 else:
 	d=totient-small
-print "d is ",d
-cipher=encrypt(n,e,message)
-print "Encrypted message is ",cipher
-decipher=decrypt(cipher,d,n)
-decipher_crt=decrypt_crt(cipher,d,p,q)
-print "Decrypted message is ",decipher
-print "Decrypted message is(using crt) ",decipher_crt
+encryption["d"]=d
+decrypted_text=[]
+print "encrypted message: ",
+for character in message:
+	cipher=encrypt(n,e,ord(character))
+	print cipher,
+	decipher_crt=decrypt_crt(cipher,d,p,q)
+	decrypted_text.append(chr(decipher_crt))
+print "\nDecrypted message is: ","".join(decrypted_text)
+for a in encryption:
+	print a,encryption[a]
+

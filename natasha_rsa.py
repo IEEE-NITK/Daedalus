@@ -28,7 +28,7 @@ def iscoprime(a,b):
 
 
 def inv_mod(a,m):
-    x=2
+    x=int(m/a)+1
     while True:
         if (a*x)%m==1:
             return x

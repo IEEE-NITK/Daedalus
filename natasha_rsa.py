@@ -1,3 +1,7 @@
+#NITK-IEEE SaS: Cryptography project
+#Natasha Y Jeppu
+#Implementation of simple RSA cryptosystem in python
+
 import math
 import random
 
@@ -26,7 +30,7 @@ def iscoprime(a,b):
         return True
     return False
 
-
+#function computes inverse modulus: returns pvt key exponent
 def inv_mod(a,m):
     x=int(m/a)+1
     while True:
@@ -35,13 +39,15 @@ def inv_mod(a,m):
         else:
             x=x+1
 
+#to generate public and private keys
 def key(a,b):
     p=gen_prime(a,b)
     while True:
         q=gen_prime(a,b)
         if p!=q:
             break
-
+    
+    #product of euler-totient of primes to serve as modulus
     n=p*q
     t=(p-1)*(q-1)
 
@@ -51,6 +57,8 @@ def key(a,b):
             break
 
     d=inv_mod(e,t)
+    
+    #e is public key exponent, d is private key exponent
     return n,e,d
     
 def encrypt(x,n,e):
@@ -59,13 +67,20 @@ def encrypt(x,n,e):
 def decrypt(x,d,n):
     return (x**d)%n
 
-def funct():
+
+#Function to implement rsa encryption and decryption 
+def funct_rsa():
     n,e,d=key(50,70)
 
-    c=encrypt(86,n,e)                       #encrypt(msg,n,e)...here 86 as example..replace with ascii
+    #encrypt(ascii of plaintext,modulus for the keys,public key exponent)
+    #taking 86 as an example to chk implementation
+    c=encrypt(86,n,e)               
+    #encrypt(ciphertext,private key exponent,modulus for the keys)
     d=decrypt(c,d,n)
 
+    #display cipher and plaintext
     print c,d
 
 
-funct()
+
+funct_rsa()

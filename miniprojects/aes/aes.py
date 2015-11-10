@@ -44,8 +44,9 @@ constantMatrix = Matrix([
 def subBytes(state):
     size = len(state)
     for i in range(size):
-        index = int(state[i], 16)
+        index = ord(state[i])
         state[i] = sbox[index]
+    return state
 
 # ShiftRows sublayer
 # ===================
@@ -57,7 +58,8 @@ def rotate(row, shift):
 # Each row gets shifted cyclically by n, where n is the row number
 def shiftRows(state):
     for i in range(4):
-        state[i*4:i*4+4] = rotate(state[i*4:i*4+4], i)
+        state[i*4:i*4+4] = [chr(x) for x in rotate(state[i*4:i*4+4], i)]
+    return state
 
 # MixColumn sublayer
 # ==================
@@ -67,57 +69,68 @@ def shiftRows(state):
 def numToPoly(num):
     # Convert hex number to binary string
     bitVector = bin(num)[2:]
+    while len(bitVector) != 8:
+        bitVector = "0" + bitVector
     # Initialize a Galois field of size 256
-    f = GF(2^8, 'x')
+    f = GF(2**8, 'x')
     x = f.gen()
     res = f(0)
     for i in range(8):
-        res += f(bitVector[i] * x^i)
+        res += f(int(bitVector[i]) * x**i)
     return res
 
 def mixColumns(state):
     output = [[] for i in range(4)]
-    f = GF(2^8, 'x')
+    f = GF(2**8, 'x')
     x = f.gen()
     # construct vector and multiply with matrix
     for i in range(4):
-        inputColumn = [state[i], state[i+4], state[i+8], state[i+12]]
+        inputColumn = [ord(state[i]), ord(state[i+4]), ord(state[i+8]), ord(state[i+12])]
         for j in range(4):
             c = f(0)
             for k in range(4):
-                c += poly[constantMatrix[j][k]] * numToPoly(inputColumn[k])
+                c += numToPoly(constantMatrix[j][k]) * numToPoly(inputColumn[k])
             # <3 Sage functions!
             output[i].append(c.integer_representation())
 
-    out = [item for sublist in output for item in sublist]
+    out = [chr(item) for sublist in output for item in sublist]
     return out
 
 # Key Addition Layer
 # ==================
 
 def addRoundKey(state, roundKey):
-    for i in len(state):
-        state[i] = state[i] ^ roundKey[i]
+    for i in range(len(state)):
+        state[i] = chr(ord(state[i]) ^ ord(roundKey[i]))
 
 def g(row, roundNum):
     # Cyclic left shift by 1
     row = rotate(row, 1)
     # S-box substitution
     for i in range(len(row)):
-        index = int(row[i], 16)
-        row[i] = sbox[index]
+        row[i] = sbox[row[i]]
     # Add round coefficient (RC) to first byte
-    f = GF(2^8, 'x')
+    f = GF(2**8, 'x')
     x = f.gen()
-    RC = f(x^(roundNum - 1))
+    RC = f(x**(roundNum - 1))
     row[0] = (numToPoly(row[0]) + RC).integer_representation()
+    return row
 
 
 def keySchedule(key):
     W = [[] for x in range(44)]
+    key = [ord(ch) for ch in key]
     W[0:4] = [key[i:i+4] for i in range(0, 13, 4)]
+    f = GF(2**8, 'x')
+    x = f.gen()
     for i in range(1, 11):
-        W[4*i] = W[4*(i-1)] + g(W[4*i-1], i)
+        glist = g(W[4*i-1], i)
+        for j in range(4):
+            W[4*i].append((numToPoly(W[4*(i-1)][j]) + numToPoly(glist[j])).integer_representation())
+        for j in range(1, 4):
+            for k in range(4):
+                W[4*i+j].append((numToPoly(W[4*i+j-1][k]) + numToPoly(W[4*(i-1)+j][k])).integer_representation())
+    W = [chr(item) for sublist in W for item in sublist]
     return ''.join(W)
 
 # returns a 16-byte round key based on an expanded key and round number
@@ -127,23 +140,37 @@ def createRoundKey(expandedKey, n):
 def encrypt():
     key = raw_input('Enter key: ')
     ptext = raw_input('Enter plaintext: ')
-    state = ptext[0:16]
-    expandedKey = keySchedule(list(key))
-    roundNum = 0
-    roundKey = createRoundKey(expandedKey, roundNum)
-    addRoundKey(state, roundKey)
-    while roundNum < 10:
+    ctext = []
+    # Padding to a multiple of 16
+    while len(ptext) % 16 != 0:
+        ptext += "="
+
+    pos = 0
+    while pos != len(ptext):
+        state = list(ptext[pos:pos+16])
+        expandedKey = keySchedule(list(key))
+        roundNum = 0
         roundKey = createRoundKey(expandedKey, roundNum)
-        subBytes(state)
-        shiftRows(state)
-        if roundnum != 9:
-            mixColumns(state)
         addRoundKey(state, roundKey)
-        roundNum += 1
-    return state
+        while roundNum < 10:
+            roundKey = createRoundKey(expandedKey, roundNum)
+            state = subBytes(state)
+            state = shiftRows(state)
+            if roundNum != 9:
+                state = mixColumns(state)
+            addRoundKey(state, roundKey)
+            roundNum += 1
+        ctext.append(''.join(state))
+        pos += 16
+
+    print "Encrypted text: ", ''.join(ctext)
 
 # Driver
 if __name__ == '__main__':
     choice = raw_input('1. Encrypt\n2. Decrypt\n')
     if choice == '1':
         encrypt()
+    elif choice == '2':
+        print 'Nothing yet!'
+    else:
+        print 'Uh-oh. Only 1 or 2!'

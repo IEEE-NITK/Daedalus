@@ -91,6 +91,22 @@ def mixColumn(state):
     out = [item for sublist in output for item in sublist]
     return out
 
+# Key Addition Layer
+# ==================
+
+def addKey(state, subkey):
+    for i in len(state):
+        state[i] = state[i] ^ subkey[i]
+
+def g():
+    pass
+
+def keySchedule(key):
+    W = [[] for x in range(44)]
+    W[0:4] = [key[i:i+4] for i in range(0, 13, 4)]
+    for i in range(1, 11):
+        W[4*i] = W[4*(i-1)] + g(W[4*i-1])
+
 # Driver
 if __name__ == '__main__':
 	print 'Nothing yet!'

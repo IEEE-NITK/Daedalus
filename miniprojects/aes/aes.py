@@ -30,33 +30,34 @@ constantMatrix = Matrix([
     [0x03, 0x01, 0x01, 0x02]
 ])
 
-# Lookup table for the constant matrix
-poly = {
-    0x01: 1,
-    0x02: x,
-    0x03: x+1
-}
+# # Lookup table for the constant matrix
+# poly = {
+#     0x01: 1,
+#     0x02: x,
+#     0x03: x+1
+# }
 
 
 # Byte Substitution layer
 # =======================
 
-def subByte(state):
-	size = len(state)
-	for i in range(size):
-		state[i] = sbox[state[i]]
+def subBytes(state):
+    size = len(state)
+    for i in range(size):
+        index = int(state[i], 16)
+        state[i] = sbox[index]
 
 # ShiftRows sublayer
 # ===================
 
 # Python slices are a handy way to easily rotate a row
 def rotate(row, shift):
-	return row[shift:] + row[:shift]
+    return row[shift:] + row[:shift]
 
 # Each row gets shifted cyclically by n, where n is the row number
 def shiftRows(state):
-	for i in range(4):
-		state[i*4:i*4+4] = rotate(state[i*4:i*4+4], i)
+    for i in range(4):
+        state[i*4:i*4+4] = rotate(state[i*4:i*4+4], i)
 
 # MixColumn sublayer
 # ==================
@@ -74,7 +75,7 @@ def numToPoly(num):
         res += f(bitVector[i] * x^i)
     return res
 
-def mixColumn(state):
+def mixColumns(state):
     output = [[] for i in range(4)]
     f = GF(2^8, 'x')
     x = f.gen()
@@ -94,19 +95,55 @@ def mixColumn(state):
 # Key Addition Layer
 # ==================
 
-def addKey(state, subkey):
+def addRoundKey(state, roundKey):
     for i in len(state):
-        state[i] = state[i] ^ subkey[i]
+        state[i] = state[i] ^ roundKey[i]
 
-def g():
-    pass
+def g(row, roundNum):
+    # Cyclic left shift by 1
+    row = rotate(row, 1)
+    # S-box substitution
+    for i in range(len(row)):
+        index = int(row[i], 16)
+        row[i] = sbox[index]
+    # Add round coefficient (RC) to first byte
+    f = GF(2^8, 'x')
+    x = f.gen()
+    RC = f(x^(roundNum - 1))
+    row[0] = (numToPoly(row[0]) + RC).integer_representation()
+
 
 def keySchedule(key):
     W = [[] for x in range(44)]
     W[0:4] = [key[i:i+4] for i in range(0, 13, 4)]
     for i in range(1, 11):
-        W[4*i] = W[4*(i-1)] + g(W[4*i-1])
+        W[4*i] = W[4*(i-1)] + g(W[4*i-1], i)
+    return ''.join(W)
+
+# returns a 16-byte round key based on an expanded key and round number
+def createRoundKey(expandedKey, n):
+    return expandedKey[(n*16):(n*16+16)]
+
+def encrypt():
+    key = raw_input('Enter key: ')
+    ptext = raw_input('Enter plaintext: ')
+    state = ptext[0:16]
+    expandedKey = keySchedule(list(key))
+    roundNum = 0
+    roundKey = createRoundKey(expandedKey, roundNum)
+    addRoundKey(state, roundKey)
+    while roundNum < 10:
+        roundKey = createRoundKey(expandedKey, roundNum)
+        subBytes(state)
+        shiftRows(state)
+        if roundnum != 9:
+            mixColumns(state)
+        addRoundKey(state, roundKey)
+        roundNum += 1
+    return state
 
 # Driver
 if __name__ == '__main__':
-	print 'Nothing yet!'
+    choice = raw_input('1. Encrypt\n2. Decrypt\n')
+    if choice == '1':
+        encrypt()

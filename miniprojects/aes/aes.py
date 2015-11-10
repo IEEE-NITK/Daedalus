@@ -22,6 +22,14 @@ sbox = [
     0x8C, 0xA1, 0x89, 0x0D, 0xBF, 0xE6, 0x42, 0x68, 0x41, 0x99, 0x2D, 0x0F, 0xB0, 0x54, 0xBB, 0x16
 ]
 
+# Constant matrix used in the MixColumn sublayer
+constantMatrix = Matrix([
+    [0x02, 0x03, 0x01, 0x01],
+    [0x01, 0x02, 0x03, 0x01],
+    [0x01, 0x01, 0x02, 0x03],
+    [0x03, 0x01, 0x01, 0x02]
+])
+
 
 # Byte Substitution layer
 # =======================
@@ -30,7 +38,7 @@ def subByte(state):
 	for i in range(size):
 		state[i] = sbox[state[i]]
 
-# Shift Rows sublayer
+# ShiftRows sublayer
 # ===================
 # Python slices are a handy way to easily rotate a row
 def rotate(row, shift):
@@ -40,6 +48,19 @@ def rotate(row, shift):
 def shiftRows(state):
 	for i in range(4):
 		state[i*4:i*4+4] = rotate(state[i*4:i*4+4], i)
+
+# MixColumn sublayer
+# ==================
+def mixColumn(state):
+    outputVectors = []
+
+    # construct vector and multiply with matrix
+    for i in range(4):
+        v = vector([state[i], state[i+4], state[i+8], state[i+12]])
+        c = constantMatrix * v
+        output.append(c)
+
+    # TODO: construct the output from the outputVectors
 
 # Driver
 if __name__ == '__main__':

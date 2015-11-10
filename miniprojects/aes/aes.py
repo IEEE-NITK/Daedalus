@@ -30,9 +30,17 @@ constantMatrix = Matrix([
     [0x03, 0x01, 0x01, 0x02]
 ])
 
+# Lookup table for the constant matrix
+poly = {
+    0x01: 1,
+    0x02: x,
+    0x03: x+1
+}
+
 
 # Byte Substitution layer
 # =======================
+
 def subByte(state):
 	size = len(state)
 	for i in range(size):
@@ -40,6 +48,7 @@ def subByte(state):
 
 # ShiftRows sublayer
 # ===================
+
 # Python slices are a handy way to easily rotate a row
 def rotate(row, shift):
 	return row[shift:] + row[:shift]
@@ -51,16 +60,36 @@ def shiftRows(state):
 
 # MixColumn sublayer
 # ==================
-def mixColumn(state):
-    outputVectors = []
 
+# Convert hex number to Galois field polynomial
+# Couldn't find an inbuilt way to do this...
+def numToPoly(num):
+    # Convert hex number to binary string
+    bitVector = bin(num)[2:]
+    # Initialize a Galois field of size 256
+    f = GF(2^8, 'x')
+    x = f.gen()
+    res = f(0)
+    for i in range(8):
+        res += f(bitVector[i] * x^i)
+    return res
+
+def mixColumn(state):
+    output = [[] for i in range(4)]
+    f = GF(2^8, 'x')
+    x = f.gen()
     # construct vector and multiply with matrix
     for i in range(4):
-        v = vector([state[i], state[i+4], state[i+8], state[i+12]])
-        c = constantMatrix * v
-        output.append(c)
+        inputColumn = [state[i], state[i+4], state[i+8], state[i+12]]
+        for j in range(4):
+            c = f(0)
+            for k in range(4):
+                c += poly[constantMatrix[j][k]] * numToPoly(inputColumn[k])
+            # <3 Sage functions!
+            output[i].append(c.integer_representation())
 
-    # TODO: construct the output from the outputVectors
+    out = [item for sublist in output for item in sublist]
+    return out
 
 # Driver
 if __name__ == '__main__':

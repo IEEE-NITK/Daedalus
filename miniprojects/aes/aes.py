@@ -30,14 +30,6 @@ constantMatrix = Matrix([
     [0x03, 0x01, 0x01, 0x02]
 ])
 
-# # Lookup table for the constant matrix
-# poly = {
-#     0x01: 1,
-#     0x02: x,
-#     0x03: x+1
-# }
-
-
 # Byte Substitution layer
 # =======================
 
@@ -137,18 +129,28 @@ def keySchedule(key):
 def createRoundKey(expandedKey, n):
     return expandedKey[(n*16):(n*16+16)]
 
-def encrypt():
+def encrypt(IV):
     key = raw_input('Enter key: ')
     ptext = raw_input('Enter plaintext: ')
     ctext = []
+    first = True
     # Padding to a multiple of 16
+    if len(ptext) % 16 != 0:
+        padChar = 16 - len(ptext) % 16
     while len(ptext) % 16 != 0:
-        ptext += "="
+        ptext += padChar
+
+    expandedKey = keySchedule(list(key))
 
     pos = 0
+    plain = []
     while pos != len(ptext):
-        state = list(ptext[pos:pos+16])
-        expandedKey = keySchedule(list(key))
+        if first == True:
+            state = IV
+            first = False
+        else:
+            state = ctext[len(ctext) - 1]
+        plain = list(ptext[pos:pos+16])
         roundNum = 0
         roundKey = createRoundKey(expandedKey, roundNum)
         addRoundKey(state, roundKey)
@@ -160,16 +162,22 @@ def encrypt():
                 state = mixColumns(state)
             addRoundKey(state, roundKey)
             roundNum += 1
+        for i in range(len(state)):
+            state[i] = chr(ord(state[i]) ^ ord(plain[i]))
         ctext.append(''.join(state))
         pos += 16
 
     print "Encrypted text: ", ''.join(ctext)
+    print "Bytes: ", [hex(ord(ch)) for ch in ''.join(ctext)]
 
 # Driver
 if __name__ == '__main__':
     choice = raw_input('1. Encrypt\n2. Decrypt\n')
     if choice == '1':
-        encrypt()
+        IV = []
+        for i in range(16):
+            IV.append(chr(randint(0, 255)))
+        encrypt(IV)
     elif choice == '2':
         print 'Nothing yet!'
     else:

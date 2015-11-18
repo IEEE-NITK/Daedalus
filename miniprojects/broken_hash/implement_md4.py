@@ -35,10 +35,10 @@ def _f3(a, b, c, d, k, s, X): return _left_rotate(a + _h(b, c, d) + X[k] + 0x6ed
 class MD4:
 	#Step3- We use four 32 bit word buffers to compute the message digest. We initialize each of the buffers to the following hex values. 
 	def __init__(self):
-		self.A = 0x01234567
-		self.B = 0x89abcdef
-		self.C = 0xfedcba98
-		self.D = 0x76543210
+		self.A = 0x67452301
+		self.B = 0xefcdab89
+		self.C = 0x98badcfe
+		self.D = 0x10325476
 	def update(self, message_string):
 		msg_bytes = txt_to_bytes(pad_message(message_string))
 		for i in range(0, len(msg_bytes), 64):

@@ -167,6 +167,7 @@ def encrypt(IV):
         ctext.append(''.join(state))
         pos += 16
 
+    print "IV: ", IV
     print "Encrypted text: ", ''.join(ctext)
     print "Bytes: ", [hex(ord(ch)) for ch in ''.join(ctext)]
 
@@ -177,6 +178,8 @@ if __name__ == '__main__':
         IV = []
         for i in range(16):
             IV.append(chr(randint(0, 255)))
+        print "IV"
+        print [hex(ord(ch)) for ch in IV]
         encrypt(IV)
     elif choice == '2':
         print 'Nothing yet!'

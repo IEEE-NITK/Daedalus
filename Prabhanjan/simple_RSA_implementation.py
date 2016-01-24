@@ -65,13 +65,9 @@ n=p*q
 #3. We compute Phi(n)-Number of natural numbers which are less than n and relatively prime to n.
 #Since n=pq, Phi(n)=Phi(p)Phi(q)
 #If p is any prime, then Phi(p)=p-1
-phi_n=(p-1)*(q-1)
+phi_n=p
 #4. We choose an arbitrary integer e such that 1<e<Phi(n) and e,Phi(n) are co prime. e is released as the public key exponent
-e=1
-while 1:
-	e=random.choice(range(2,phi_n))
-	if gcd(e,phi_n)==1:
-		break
+e=q
 #5. We compute d- multiplicative inverse of e congruent modulo phi_n. We use Extended Euclidean Algorithm to compute d. d is kept as private key exponent 
 d=extended_euclid(e,phi_n)
 print "Public Key pair- %d,%d\nPrivate Key-%d\n"%(e,n,d)

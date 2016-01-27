@@ -7,7 +7,17 @@ TO DO
 3.Optimizations(if any)
 """
 
-from sys import argv
+#The input{} must have 
+#1. Encrypted Message files E and F.
+#2. Public Key 1 and 2 with their paths as strings.
+#3. Example:
+#   {
+#		E:"/usr/folder/file1"
+#		F:"/usr/folder/file2"
+#		Key1:"/media/jk/jl/key1.pem"
+#		Key2:"/media/user/ll/key2.pem"
+#	}
+
 from Crypto.PublicKey import RSA
 
 def encode(message_string):
@@ -78,18 +88,15 @@ def extract_exponents(public_key_file_1 , public_key_file_2):
 	pem_file_two.close()
 	return key_one.e , key_two.e , key_one.n
 
-if ( len(argv) != 5 ):
-
-	print "insufficient arguements"
-
-file_to_decrypt_1 = open(argv[3],'r')
-file_to_decrypt_2 = open(argcv[4],'r')
-encrypted_1 = file_to_decrypt.read()
-encrypted_encoded_1 = encode(encrypted_1)
-encrypted_2 = file_to_decrypt_2.read()
-encrypted_encoded_2 = encode(encrypted_2)
-exponents = extract_exponents(argv[1],argv[2])
-compute_x_and_y = extended_euclidian_algorithm(exponents(0),exponents(1))
-decoded = ( ( encrypted_encoded_1 ** compute_x_and_y(1) ) * ( encrypted_encoded_2 ** compute_x_and_y(2)) % exponents(2)
-final_decrypted = decode(decoded)
-	
+def attack(inputs={}, errors=[], results={}):
+	file_to_decrypt_1 = open(inputs[key1],'r')
+	file_to_decrypt_2 = open(inputs[key2],'r')
+	encrypted_1 = file_to_decrypt.read()
+	encrypted_encoded_1 = encode(encrypted_1)
+	encrypted_2 = file_to_decrypt_2.read()
+	encrypted_encoded_2 = encode(encrypted_2)
+	exponents = extract_exponents(inputs[E],inputs[F])
+	compute_x_and_y = extended_euclidian_algorithm(exponents(0),exponents(1))
+	decoded = ( ( encrypted_encoded_1 ** compute_x_and_y(1) ) * ( encrypted_encoded_2 ** compute_x_and_y(2))) % exponents(2)
+	final_decrypted = decode(decoded)
+	return {'errors': errors, 'results': results}

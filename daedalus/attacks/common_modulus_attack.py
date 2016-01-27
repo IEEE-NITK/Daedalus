@@ -7,8 +7,18 @@ TO DO
 3.Optimizations(if any)
 """
 
-from sys import argv
+#The input{} must have 
+#1. Encrypted Message files E and F.
+#2. Public Key 1 and 2 with their paths as strings.
+#3. Example:
+#   {
+#		Key1:"/media/jk/jl/key1.pem"
+#		Key2:"/media/user/ll/key2.pem"
+#	}
+
 from Crypto.PublicKey import RSA
+
+errors = []
 
 def encode(message_string):
 	
@@ -43,8 +53,11 @@ def decode(encoded_number):
 	
 def extended_euclidian_algorithm(private_exponent_e1, private_exponent_e2):
 	
-	private_exponent_e1 = int(private_exponent_e1)
-	private_exponent_e2 = int(private_exponent_e2)
+	try:
+		private_exponent_e1 = int(private_exponent_e1)
+		private_exponent_e2 = int(private_exponent_e2)
+	except TypeError as e:
+		globals()['errors'].append(e)
 	
 	if(private_exponent_e2 > private_exponent_e2):
 	
@@ -63,33 +76,39 @@ def extended_euclidian_algorithm(private_exponent_e1, private_exponent_e2):
 	
 def extract_exponents(public_key_file_1 , public_key_file_2):
 	
-	pem_file_one = open(public_key_file_1,'r')
-	pem_file_two = open(public_key_file_2,'r')
-	key_one = RSA.importKey(pem_file_one.read())
-	key_two = RSA.importKey(pem_file_two.read())
+	try:
+		pem_file_one = open(public_key_file_1,'r')
+		pem_file_two = open(public_key_file_2,'r')
+		key_one = RSA.importKey(pem_file_one.read())
+		key_two = RSA.importKey(pem_file_two.read())
+	except TypeError as e:
+		globals()['errors'].append(e)
 	
 	if ( key_one.n != key_two.n ):
 	
-		print 'Unable to implement common modulus attack.'
-		print 'Modulii are different. :('
+		globals()['errors'].append('Unable to implement common modulus attack.Modulii are different. :(')
 		return None
 	
 	pem_file_one.close()
 	pem_file_two.close()
 	return key_one.e , key_two.e , key_one.n
 
-if ( len(argv) != 5 ):
-
-	print "insufficient arguements"
-
-file_to_decrypt_1 = open(argv[3],'r')
-file_to_decrypt_2 = open(argcv[4],'r')
-encrypted_1 = file_to_decrypt.read()
-encrypted_encoded_1 = encode(encrypted_1)
-encrypted_2 = file_to_decrypt_2.read()
-encrypted_encoded_2 = encode(encrypted_2)
-exponents = extract_exponents(argv[1],argv[2])
-compute_x_and_y = extended_euclidian_algorithm(exponents(0),exponents(1))
-decoded = ( ( encrypted_encoded_1 ** compute_x_and_y(1) ) * ( encrypted_encoded_2 ** compute_x_and_y(2)) % exponents(2)
-final_decrypted = decode(decoded)
-	
+def attack(inputs={}, errors=[], results={}):
+	try:
+		file_to_decrypt_1 = open(inputs[key1],'r')
+		file_to_decrypt_2 = open(inputs[key2],'r')
+		encrypted_1 = file_to_decrypt.read()
+		encrypted_encoded_1 = encode(encrypted_1)
+		encrypted_2 = file_to_decrypt_2.read()
+	except TypeError as e:
+		globals()['errors'].append(e)
+		
+	encrypted_encoded_2 = encode(encrypted_2)
+	E = raw_input("Enter the filename containing the First Encryption of the Message M:Example-/usr/folder/file1")
+	F = raw_input("Enter the filename containing the Second Encryption of the Message M:Example-/usr/folder/file2")
+	exponents = extract_exponents(E,F)
+	compute_x_and_y = extended_euclidian_algorithm(exponents(0),exponents(1))
+	decoded = ( ( encrypted_encoded_1 ** compute_x_and_y(1) ) * ( encrypted_encoded_2 ** compute_x_and_y(2))) % exponents(2)
+	final_decrypted = decode(decoded)
+	results["common modulus attack"] = final_decrypted
+	return {'errors': globals()['errors'], 'results': results}

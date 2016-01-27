@@ -13,5 +13,5 @@
 # 			 errors encountered.
 # 	results: It should be a dictionary containing all the results that 
 #			 can be derived from the given data.
-def attack(input={}, errors=[], results={}):
+def attack(input={}):
 	return {'errors': errors, 'results': results}

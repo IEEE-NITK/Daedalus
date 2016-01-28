@@ -1,4 +1,22 @@
+#Coppersmith's attack
+
+#Input: 
+#1. The message (msg)
+#2. The number of parties to which the encrypted message is to be sent (num_parties)
+
+#Possible Errors/Exceptions:
+#1. If the modular inverse does not exist
+#2. If the inputs to the Chinese Remainder Theorem function are not pairwise coprime (encrypted message, n from the public key)
+
+#Results:
+#1. The public key
+#2. The encrypted message
+#3. Solutions to the Chinese Remainder Theorem
+#4. The hacked message
+
 import random
+
+errors=[]
 
 def isPrime(i):
     '''
@@ -41,8 +59,11 @@ def modinv(e, z):
     Euclid's extended algorithm for finding the multiplicative inverse of two numbers
     '''
     g, x, y = extended_gcd(e, z)
-    if g != 1:
-        raise Exception('modular inverse does not exist')
+    if(g!= 1):
+        try:
+            raise Exception("modular inverse does not exist")
+        except Exception as e:
+            globals()['errors'].append(e)
     else:
         return x % z
         
@@ -82,56 +103,63 @@ def chinese_remainder_theorem(items):
   for a, n in items:
     m = N//n
     r, s, d = extended_gcd(n, m)
-    if d != 1:
-      raise "Input not pairwise co-prime"
+    if(d!= 1):
+        try:
+            raise Exception("Input not pairwise co-prime")
+        except Exception as e:
+            globals()['errors'].appends(e)
     result += a*s*m
 
   # Make sure we return the canonical solution.
   return result % N
 
-e=3
-cipher=[]
-N = []
-m = 1
-C = 0
+def attack(inputs):
+  results={}
+  e=3
+  cipher=[]
+  N = []
+  m = 1
+  C = 0
 
 
-print "Input a message"
-message = input()
+  #print "Input a message"
+  message = inputs[0]
 
-print "Enter number of parties you wish to send encrypted message."
-No_parties = input()
+  #print "Enter number of parties you wish to send encrypted message."
+  No_parties = inputs[1]
 
-for party in range (0,No_parties):
-    while(1):
-        p = Prime()
-        q = Prime()
-        while (p==q):
-            p=Prime()
-            q=Prime()
+  for party in range (0,No_parties):
+      while(1):
+          p = Prime()
+          q = Prime()
+          while (p==q):
+              p=Prime()
+              q=Prime()
 
-        n = Modulus(p, q)
-        z = EulerTotientFn(p,q)
-        if(gcd(e,z)==1):
-            break;
+          n = Modulus(p, q)
+          z = EulerTotientFn(p,q)
+          if(gcd(e,z)==1):
+              break;
 
         
-    publicKey=[e,n]
-    print "Public key: ", publicKey
-    en= encrypt(message,n,e)
-    cipher.append(en)
-    N.append(n)
-    print "encrypted message ",cipher[party]
+      publicKey=[e,n]
+      results["Public key"]= publicKey
+      en= encrypt(message,n,e)
+      cipher.append(en)
+      N.append(n)
+      results["encrypted message "]=cipher[party]
 
-items=[]
-for i in xrange(0,No_parties):
-    items.append((cipher[i],N[i]))
+  items=[]
+  for i in xrange(0,No_parties):
+      items.append((cipher[i],N[i]))
 
-C=chinese_remainder_theorem(items)
-print C
-hacked_message = C ** (1/3.0)
-print hacked_message
+  C=chinese_remainder_theorem(items)
+  hacked_message = C ** (1/3.0)
+  results["hacked message"]=hacked_message
+  print hacked_message
+
+  return {'errors': globals()['errors'], 'results': results}
+inputs=[14,7]
 
 
-
-
+attack(inputs)

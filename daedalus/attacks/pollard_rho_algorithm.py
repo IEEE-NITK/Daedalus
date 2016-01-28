@@ -1,5 +1,10 @@
 #pollard rho algorithm of integer factorization
 
+import random
+import math
+from Crypto.PublicKey import RSA
+
+errors = []
 
 def gcd(a,b):
     if a is 0:
@@ -7,6 +12,11 @@ def gcd(a,b):
     return gcd(b%a,a)
 
 def pollard_rho(number,x,y):
+    try:
+        number = int(number)
+    except TypeError as n:
+        globals()['errors'].append(n)
+
     d = 1
     while d is 1:
         x = (x**2+1)%number
@@ -19,14 +29,21 @@ def pollard_rho(number,x,y):
         d = gcd(z,number)
     return d
 
-x=2
-y=2
-number = 84923983
-factor = pollard_rho(number,x,y)
-while factor is number or 1:
-    x = x+1
-    y = y+1
-    pollard_rho(number,x,y)
-factor2 = int(number/factor)
 
-print(factor,factor2)
+def attack(input={},errors = {},results = {}):
+    try :
+          number = int(input["key"])
+    except TypeError as n:
+        globals()['errors'].append(n)
+
+    x=2
+    y=2
+    factor = pollard_rho(number,x,y)
+    while factor is number or 1:
+        x = x+1
+        y = y+1
+        factor = pollard_rho(number,x,y)
+    factor2 = int(number/factor)
+    results["p "]= factor
+    results["q "]= factor2
+    return {'errors': globals()['errors'],'results':results}

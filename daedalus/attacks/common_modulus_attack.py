@@ -2,7 +2,7 @@
 
 """
 TO DO
-1.Documentation
+1.Line comments
 2.Testing
 3.Optimizations(if any)
 """
@@ -18,21 +18,31 @@ TO DO
 
 from Crypto.PublicKey import RSA
 
+#The global error basket: To collect all the errors that occur during the attack operation.
 errors = []
-
-def encode(message_string):
+"""
+The encode function encodes the message string into a number,
+by taking the binary representation of the character and appending
+them all together to form one big number.
+"""
+def encode(message_string): 
 	
 	input_tokens = ""
 	for character in message_string:
-		
 		temp = str((bin(ord(character)))[2:])
 		if(len(temp) != 8):
 			temp = (8-len(temp))*"0" + temp
-			
-		input_tokens += temp
-		
+		input_tokens += temp		
 	return int(input_tokens,2)
 	
+"""
+End of the encode function
+"""
+
+"""
+The decode function is designed to recover the original string,
+assuming that the encoding was done using the above function.
+"""
 def decode(encoded_number):
 	
 	decoded_message = ""
@@ -40,17 +50,24 @@ def decode(encoded_number):
 	binary_string = bin(encoded_number)[2:]
 	
 	if( len(binary_string) % 8 != 0 ):
-	
 		binary_string = (8 - (len(binary_string) % 8)) * "0" + binary_string
 		
 	while(len(binary_string) > 0):
-	
 		temp = int(binary_string[0:8],2)
 		decoded_message += chr(temp)
 		binary_string = binary_string[8:]
 		
 	return decoded_message		
 	
+"""
+The extended euclidian algoithm returns a tuple consisting of three numbers:
+1. gcd of the two parameters.
+2. Beruit's* identity x and y for the given parameters.
+
+*Given two integers a and b, Beruit's identity integers x and y are two integers
+that satisfy the below condition,
+(a*x) + (b*y) = gcd(a,b)
+"""
 def extended_euclidian_algorithm(private_exponent_e1, private_exponent_e2):
 	
 	try:
@@ -73,7 +90,16 @@ def extended_euclidian_algorithm(private_exponent_e1, private_exponent_e2):
 	
 	gcd = private_exponent_e2
 	return gcd , x , y
-	
+
+"""
+The parameters for extract_exponents() must be a valid file location,
+parsable by python.
+It also checks if the both the key files have the same modulus.
+The function returns a tuple consisting of:
+1. Exponent e1 of the first key.
+2. Exponent e2 of the second key.
+3. The (common) modulus n.
+"""
 def extract_exponents(public_key_file_1 , public_key_file_2):
 	
 	try:
@@ -93,6 +119,14 @@ def extract_exponents(public_key_file_1 , public_key_file_2):
 	pem_file_two.close()
 	return key_one.e , key_two.e , key_one.n
 
+"""
+The driver function attack():in accordance with the guidelines specified,
+performs exponent extraction,
+decryption, and
+decoding
+It returns the results by adding an entry to the dictionary: results.
+The key for the result is "common modulus attack"
+"""
 def attack(inputs={}, errors=[], results={}):
 	try:
 		file_to_decrypt_1 = open(inputs[key1],'r')

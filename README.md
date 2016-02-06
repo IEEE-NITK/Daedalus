@@ -1,5 +1,5 @@
-# NITK IEEE SaS
-Repository for code pertaining to the Cryptography project undertaken by NITK IEEE Systems and Security Programming Group
+# Daedalus
+Repository for code pertaining to the Cryptography project undertaken by NITK IEEE Systems and Security Programming Group.
 
 ### Contributing
 

@@ -51,17 +51,17 @@ def encrypt(m,e,n):
 def decrypt(c,d,n):
     #Decrypts message using private key d
     return expmod(c,d,n)
-if(len(argv)!=4):
-    print "Usage- sage weiner.sage <message> <modulus> <exponent>"
-else:
-    message=int(argv[1])
-    N=int(argv[2])
-    e=int(argv[3])
-    print "Plaintext- ",
-    print message
-    ciphertext=encrypt(message,e,N)
-    print "Ciphertext- ",
-    print ciphertext
-    d=check(list(convergents(contfrac(e,N))),N,e)
-    print "Decypted message- ",
-    print decrypt(ciphertext,d,N)
+
+def attack(input):
+	errors=""
+	results=[]
+	try:
+		N=input['n']
+		e=input['e']
+	except:
+		errors="Wrong input Format"
+	d=check(list(convergents(contfrac(e,N))),N,e)
+	results.append(d)
+	return {'errors': errors, 'results': results}
+	
+

@@ -46,7 +46,7 @@ class Daedalus():
 			#Do Something
 
 		elif code=='pollard_rho':
-			out=attacks.pollard_rho_algorithm.attack({'n':self.n,'e':self.e})
+			out=attacks.common_modulus_attack.attack({'n':self.n,'e':self.e})
 			print "Results" ,
 			print out['results']
 			print "Errors" ,

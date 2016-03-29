@@ -1,3 +1,4 @@
+import math 
 from sys import argv
 #Weiner's attack - private key d is small
 
@@ -13,13 +14,10 @@ def check (s,N,e):
         if(k!=0):
             if (d%2!=0 and (e*d-1)%k==0):
                 phi=(e*d-1)/k;
-                p=find_root(x^2+(phi-N-1)*x+N==0,0,sqrt(N))# quadratic equation with p,q, as roots
-                q=find_root(x^2+(phi-N-1)*x+N==0,sqrt(N),N)
-                if((p-int(p)<=0.00001) and (q-int(q)<=0.000001)):  #chk if integer roots
-                    D=d                                           
-                    print "Private key found ! \nFactors of N- "
-                print p
-                print q
+                p,q=find_root({'a':1,'b':phi-N-1,'c':N})# quadratic equation with p,q, as roots
+                if((p-int(p)==0) and (q-int(q)==0)):  #chk if integer roots
+                    D=d                           
+                
     return D
 
 #function to get continued fractions of the rational number p/q
@@ -35,7 +33,13 @@ def convergents(cf):
     for c in cf:
         r, s, p, q = p, q, c*p+r, c*q+s
         yield p, q
-
+def find_root(coefficients):
+	a=coefficients['a']
+	b=coefficients['b']
+	c=coefficients['c']
+	p= (-b+math.sqrt(b**2-4*a*c))/(2*a)
+	q= (-b-math.sqrt(b**2-4*a*c))/(2*a)
+	return [p,q]
 def expmod(m,e,n):
     #Returns c congruent to m power e modulo n.
     c=1
@@ -51,17 +55,16 @@ def encrypt(m,e,n):
 def decrypt(c,d,n):
     #Decrypts message using private key d
     return expmod(c,d,n)
-if(len(argv)!=4):
-    print "Usage- sage weiner.sage <message> <modulus> <exponent>"
-else:
-    message=int(argv[1])
-    N=int(argv[2])
-    e=int(argv[3])
-    print "Plaintext- ",
-    print message
-    ciphertext=encrypt(message,e,N)
-    print "Ciphertext- ",
-    print ciphertext
-    d=check(list(convergents(contfrac(e,N))),N,e)
-    print "Decypted message- ",
-    print decrypt(ciphertext,d,N)
+
+def attack(input):
+	errors=""
+	results=[]
+	try:
+		N=input['n']
+		e=input['e']
+	except:
+		errors="Wrong input Format"
+	d=check(list(convergents(contfrac(e,N))),N,e)
+	results.append(d)
+	return {'errors': errors, 'results': results}
+

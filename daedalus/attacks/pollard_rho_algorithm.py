@@ -1,8 +1,11 @@
 #pollard rho algorithm of integer factorization
 
+import random
+import math
+
 
 def gcd(a,b):
-    if a is 0:
+    if a<=0:
         return b
     return gcd(b%a,a)
 
@@ -19,14 +22,21 @@ def pollard_rho(number,x,y):
         d = gcd(z,number)
     return d
 
-x=2
-y=2
-number = 84923983
-factor = pollard_rho(number,x,y)
-while factor is number or 1:
-    x = x+1
-    y = y+1
-    pollard_rho(number,x,y)
-factor2 = int(number/factor)
+def attack(input={}):
+    #initialising x and y values
+    x=2
+    y=2
+    errors=[]
+    try:
+        number = input['n']
+    except TypeError as e:
+        errors.append(e)
+    factor1 = pollard_rho(number,x,y)
+    while factor1 is  1:
+        x = x+1
+        y = y+1
+        factor1 = pollard_rho(number,x,y)
+    factor2 = int(number/factor1)
+    results ={'p':factor1,'q':factor2}
+    return {'errors':errors,'results':results}
 
-print(factor,factor2)

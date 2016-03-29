@@ -2,6 +2,7 @@
 import sys
 import attacks.wieners
 import attacks.common_modulus_attack
+import attacks.pollard_rho_algorithm
 class Daedalus():
 	def __init__(self):
 		self.n = None

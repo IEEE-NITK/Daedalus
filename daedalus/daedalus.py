@@ -36,7 +36,10 @@ class Daedalus():
 		if code == 'ex':
 			# Call the appropriate attack module
 			pass
-
+		elif code == 'cma':
+			m1=raw_input( "Enter the encrypted file 1")
+			m2=raw_input( "Enter the encrypted file 2")
+			
 def shell():
 	entered = ''
 	while entered != 'quit':
@@ -56,12 +59,13 @@ r.loadpubkey(path, 'file')   Load pubkey from file
 r.loadprivkey((d,))          Load privkey as (d,)
 r.loadprivkey(path)          Load privkey from file
 r.attack(code)               Run attack corresponding to code (see help attacks)
+
 			'''
 		elif entered == 'help attacks':
 			print '''
 Attack                       Code
 ------                       ----
-Example                      ex
+Common Modulus Attack        cma             
 '''
 		else:
 			try:

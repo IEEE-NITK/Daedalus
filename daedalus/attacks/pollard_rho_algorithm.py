@@ -3,6 +3,7 @@
 import random
 import math
 
+
 def gcd(a,b):
     if a<=0:
         return b
@@ -21,7 +22,7 @@ def pollard_rho(number,x,y):
         d = gcd(z,number)
     return d
 
-def pollard_rho_attack(input={}):
+def attack(input={}):
     #initialising x and y values
     x=2
     y=2

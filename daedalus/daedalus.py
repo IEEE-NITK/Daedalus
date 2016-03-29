@@ -39,7 +39,9 @@ class Daedalus():
 			print "Errors" ,
 			print out['errors']
 		elif code=='common_mod':
-			out=attacks.common_modulus_attack.attack({'n':self.n,'e':self.e})
+			m1=raw_input( "Enter the encrypted file 1")
+			m2=raw_input( "Enter the encrypted file 2")
+			out=attacks.common_modulus_attack.attack({'m1':m1,'m2':m2})
 			print "Results" ,
 			print out['results']
 			print "Errors" ,

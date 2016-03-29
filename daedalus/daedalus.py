@@ -2,7 +2,6 @@
 import sys
 import attacks.wieners
 import attacks.common_modulus_attack
-import attacks.pollard_rho_algorithm
 class Daedalus():
 	def __init__(self):
 		self.n = None
@@ -29,28 +28,28 @@ class Daedalus():
 			except:
 				print "File not found"
 		else:
-			# Assuming input is of the formei (d,)
+			# Assuming input is of the form (d,)
 			self.d = args[0]
 	def attack(self, code):
 		if code == 'wieners':
 			out=attacks.wieners.attack({'n':self.n,'e':self.e})
-			print "Results" ,
+			print "results: d=" ,
 			print out['results']
-			print "Errors" ,
+			print "errors" ,
 			print out['errors']
 		elif code=='common_mod':
 			out=attacks.common_modulus_attack.attack({'n':self.n,'e':self.e})
-			print "Results" ,
+			print "results" ,
 			print out['results']
-			print "Errors" ,
+			print "errors" ,
 			print out['errors']
 			#Do Something
 
 		elif code=='pollard_rho':
 			out=attacks.pollard_rho_algorithm.attack({'n':self.n,'e':self.e})
-			print "Results" ,
+			print "results" ,
 			print out['results']
-			print "Errors" ,
+			print "errors" ,
 			print out['errors']
 			#Do Something
 
@@ -78,7 +77,7 @@ r.attack(code)               Run attack corresponding to code (see help attacks)
 			'''
 		elif entered == 'help attacks':
 			print '''
-Attack       lp                Code
+Attack                         Code
 ------                         ----
 Wieners Attack                wieners
 Pollard Rho Algorithm 	      pollard_rho

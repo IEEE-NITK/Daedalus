@@ -1,4 +1,6 @@
 import sys
+load("attacks/temp.sage")
+load("attacks/common_modulus_attack.sage")
 
 class Daedalus():
 	def __init__(self):
@@ -23,6 +25,20 @@ class Daedalus():
 			self.d = int(f.readline())
 		else:
 			self.d = args[0]
+	def attack(self, code):
+		if code == 'wieners':
+			out=wieners_attack({'N':self.n,'e':self.e})
+			print "results: d=" ,
+			print out['results']
+			print "errors: " ,
+			print out['errors']
+		elif code=='common_mod':
+			out = common_modulus_attack({'n':self.n,'e':self.e})
+			print "results" ,
+			print out['results']
+			print "errors" ,
+			print out['errors']
+			#Do Something
 
 def shell():
 	entered = ''
@@ -33,7 +49,10 @@ def shell():
 		elif(entered == "help"):
 			print "help"
 		else:
-			exec(entered)
+			try:
+				exec(entered)
+			except:
+				print "Wrong Usage"
 
 if __name__ == '__main__':
 	print '''
@@ -44,3 +63,17 @@ if __name__ == '__main__':
  \__,_|\__,_|\___|\__,_|\__,_|_|\__,_|___/
  '''
 	shell()
+	def attack(self, code):
+		if code == 'wieners':
+			out=attacks.wieners.attack({'n':self.n,'e':self.e})
+			print "results: d=" ,
+			print out['results']
+			print "errors" ,
+			print out['errors']
+		elif code=='common_mod':
+			out=attacks.common_modulus_attack.attack({'n':self.n,'e':self.e})
+			print "results" ,
+			print out['results']
+			print "errors" ,
+			print out['errors']
+			#Do Something

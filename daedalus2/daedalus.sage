@@ -43,16 +43,35 @@ class Daedalus():
 def shell():
 	entered = ''
 	while(entered != 'quit'):
-		entered = raw_input('>>')
+		entered = raw_input('>>').strip()
 		if(entered == 'quit'):
 			sys.exit(0)
 		elif(entered == "help"):
-			print "help"
+			print '''
+Welcome to Daedalus, the unified RSA attacker!
+Command                      Purpose
+-------                      -------
+help attacks                 List all supported attacks
+r = Daedalus()               Create new instance of Daedalus
+r.loadpubkey((n,e,))         Load pubkey as (n,e,)
+r.loadpubkey(path, 'file')   Load pubkey from file
+r.loadprivkey((d,))          Load privkey as (d,)
+r.loadprivkey(path)          Load privkey from file
+r.attack(code)               Run attack corresponding to code (see help attacks)
+						'''
+		elif entered == 'help attacks':
+			print '''
+Attack                         Code
+------                         ----
+Wieners Attack                wieners
+Common Modulus		      common_mod
+				'''
 		else:
 			try:
 				exec(entered)
 			except:
 				print "Wrong Usage"
+				print "Try - help or help attacks"
 
 if __name__ == '__main__':
 	print '''

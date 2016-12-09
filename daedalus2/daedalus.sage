@@ -1,5 +1,5 @@
 import sys
-load("attacks/temp.sage")
+load("attacks/wieners.sage")
 load("attacks/common_modulus_attack.sage")
 
 class Daedalus():
@@ -10,8 +10,12 @@ class Daedalus():
 		self.results = None
 		self.errors  = None
 
-	def loadpubkey(self, args, type=None):
-		if (type == 'file'):
+	def print_pub_key(self):
+		print self.n
+		print self.e
+
+	def loadpubkey(self, args, option):
+		if(option == "file"):
 			f = open(args, 'r')
 			self.n = int(f.readline())
 			self.e = int(f.readline())
@@ -27,7 +31,7 @@ class Daedalus():
 			self.d = args[0]
 	def attack(self, code):
 		if code == 'wieners':
-			out=wieners_attack({'N':self.n,'e':self.e})
+			out = wieners_attack({'N':self.n,'e':self.e})
 			print "results: d=" ,
 			print out['results']
 			print "errors: " ,
@@ -49,15 +53,16 @@ def shell():
 		elif(entered == "help"):
 			print '''
 Welcome to Daedalus, the unified RSA attacker!
-Command                      Purpose
--------                      -------
-help attacks                 List all supported attacks
-r = Daedalus()               Create new instance of Daedalus
-r.loadpubkey((n,e,))         Load pubkey as (n,e,)
-r.loadpubkey(path, 'file')   Load pubkey from file
-r.loadprivkey((d,))          Load privkey as (d,)
-r.loadprivkey(path)          Load privkey from file
-r.attack(code)               Run attack corresponding to code (see help attacks)
+Command                      		Purpose
+-------                      		-------
+help attacks                 		List all supported attacks
+r = Daedalus()               		Create new instance of Daedalus
+r.loadpubkey((n,e,),"number")         	Load pubkey as (n,e,)
+r.loadpubkey(filename, "file")         	Load pubkey as (n,e,)
+r.loadpubkey(path, 'file')  	 	Load pubkey from file
+r.loadprivkey((d,))          		Load privkey as (d,)
+r.loadprivkey(path)          		Load privkey from file
+r.attack(code)               		Run attack corresponding to code (see help attacks)
 						'''
 		elif entered == 'help attacks':
 			print '''
@@ -70,6 +75,7 @@ Common Modulus		      common_mod
 			try:
 				exec(entered)
 			except:
+				print "Unexpected error", sys.exc_info()[0], sys.exc_info()[1]
 				print "Wrong Usage"
 				print "Try - help or help attacks"
 
@@ -82,17 +88,3 @@ if __name__ == '__main__':
  \__,_|\__,_|\___|\__,_|\__,_|_|\__,_|___/
  '''
 	shell()
-	def attack(self, code):
-		if code == 'wieners':
-			out=attacks.wieners.attack({'n':self.n,'e':self.e})
-			print "results: d=" ,
-			print out['results']
-			print "errors" ,
-			print out['errors']
-		elif code=='common_mod':
-			out=attacks.common_modulus_attack.attack({'n':self.n,'e':self.e})
-			print "results" ,
-			print out['results']
-			print "errors" ,
-			print out['errors']
-			#Do Something

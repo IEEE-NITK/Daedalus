@@ -53,7 +53,7 @@ decoding
 It returns the results by adding an entry to the dictionary: results.
 The key for the result is "common modulus attack"
 """
-def attack(inputs={'m1':"e_m.txt",'m2':"e_k.txt"}, errors=[], results={}):
+def common_modulus_attack(inputs={'m1':"e_m.txt",'m2':"e_k.txt"}, errors=[], results={}):
     try:
         
         file_to_decrypt_1 = open(inputs['m1'],'r')
@@ -115,5 +115,5 @@ def attack(inputs={'m1':"e_m.txt",'m2':"e_k.txt"}, errors=[], results={}):
     return {'errors': globals()['errors'], 'results': results}
 
 if __name__ == "__main__":
-    a=attack()
+    a=common_modulus_attack()
     print a

@@ -21,19 +21,19 @@ def generate_keys():
 	print "private key exponent d- " + str(d)
 	return [N,e,phi_N,d]
 
-message = Integer(raw_input("Enter message(max length 2048 bits)- "))
-key_list = generate_keys()
-print "message- " + str(message)
-N = key_list[0]
-e = key_list[1]
-phi_N = key_list[2]
-d = key_list[3]
-
-#Encryption
-ciphertext = modexp(message, e, N)
-print "ciphertext- " + str(ciphertext)
-
-#Decryption
-plaintext = modexp(ciphertext, d, N)
-print "decrpyted plaintext- " + str(plaintext)
-print plaintext == message	
+##message = Integer(raw_input("Enter message(max length 2048 bits)- "))
+##key_list = generate_keys()
+##print "message- " + str(message)
+##N = key_list[0]
+##e = key_list[1]
+##phi_N = key_list[2]
+#d = key_list[3]
+#
+##Encryption
+#ciphertext = modexp(message, e, N)
+#print "ciphertext- " + str(ciphertext)
+#
+##Decryption
+#plaintext = modexp(ciphertext, d, N)
+#print "decrpyted plaintext- " + str(plaintext)
+#print plaintext == message	

@@ -7,15 +7,15 @@ function reduced_basis = LLL_test(basis)
 		u(i,i) = 1
 		orthogonal_basis(:,i) = basis(:,i)
 		for j=1:i-1
-			u(j,i) = (basis(:,i)'*basis(:,j))/(basis(:,j)'*basis(:,j))
+			u(j,i) = (basis(:,i)'*orthogonal_basis(:,j))/(orthogonal_basis(:,j)'*orthogonal_basis(:,j))
 			orthogonal_basis(:,i) = orthogonal_basis(:,i) - u(j,i)*orthogonal_basis(:,j)
 		endfor
 		[basis,u] = reduce(i,basis,u)
 	endfor
 	i = 1
 	while(i<m)
-		c= 0.75
-		if((basis(:,i)'*basis(:,i)) <= 0.75*(basis(:,i+1)'*basis(:,i+1)))
+		c= 4/3
+		if((basis(:,i)'*basis(:,i)) <= c*(basis(:,i+1)'*basis(:,i+1)))
 			i = i+1
 		else
 			orthogonal_basis(:,i+1) = orthogonal_basis(:,i+1) + u(i,i+1)*orthogonal_basis(:,i)

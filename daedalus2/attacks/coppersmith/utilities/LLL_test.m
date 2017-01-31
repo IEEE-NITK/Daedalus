@@ -1,3 +1,6 @@
+%Usage - reduced_basis = LLL_test(basis)
+%basis must be a square matrix of full rank. The function outputs another square matrix which spans the same lattice. The matrix output is "reduced" in the LLL sense(ie- satisfies the LLL conditions). The first vector(column) of the output is approximately the shortest vector. 
+
 function reduced_basis = LLL_test(basis)
 	m = size(basis)(2)
 	u = zeros(m,m)

@@ -1,62 +1,27 @@
-%Usage - reduced_basis = LLL_test(basis)
-%basis must be a square matrix of full rank. The function outputs another square matrix which spans the same lattice. The matrix output is "reduced" in the LLL sense(ie- satisfies the LLL conditions). The first vector(column) of the output is approximately the shortest vector. 
-
-function reduced_basis = LLL_test(basis)
-	m = size(basis)(2)
-	u = zeros(m,m)
-	orthogonal_basis = zeros(m,m)
-	for i=1:m
-		u(i,:) = zeros(1,m)
-		u(i,i) = 1
-		orthogonal_basis(:,i) = basis(:,i)
-		for j=1:i-1
-			u(j,i) = (basis(:,i)'*orthogonal_basis(:,j))/(orthogonal_basis(:,j)'*orthogonal_basis(:,j))
-			orthogonal_basis(:,i) = orthogonal_basis(:,i) - u(j,i)*orthogonal_basis(:,j)
-		endfor
-		[basis,u] = reduce(i,basis,u)
-	endfor
+function reduced_basis = LLL(basis)
+	n = size(basis)(2)
+	[U,mu] = gram_schmidt(basis)
+	[basis, mu] = size_reduce(basis,mu,1)
 	i = 1
-	while(i<m)
-		c= 4/3
-		if((basis(:,i)'*basis(:,i)) <= c*(basis(:,i+1)'*basis(:,i+1)))
+	while(i<n)
+		if(lovasz_condition(U(:,i),U(:,i+1),mu(i,i+1))==1)
 			i = i+1
 		else
-			orthogonal_basis(:,i+1) = orthogonal_basis(:,i+1) + u(i,i+1)*orthogonal_basis(:,i)
-			u(i,i) = (basis(:,i)'*orthogonal_basis(:,i+1))/(orthogonal_basis(:,i+1)'*orthogonal_basis(:,i+1))
-			u(i+1,i) = 1 
-			u(i,i+1) = 1 
-			orthogonal_basis(:,i) = orthogonal_basis(:,i) - u(i,i)*orthogonal_basis(:,i+1)
-			temp = u(:,i)
-			u(:,i) = u(:,i+1)
-			u(:,i+1) = temp 
-			temp = orthogonal_basis(:,i)
-			orthogonal_basis(:,i) = orthogonal_basis(:,i+1)
-			orthogonal_basis(:,i+1) = temp 
 			temp = basis(:,i)
 			basis(:,i) = basis(:,i+1)
-			basis(:,i+1) = temp 
-			for k=1+2:m
-				u(i,k) = (basis(:,k)'*orthogonal_basis(:,i))/(orthogonal_basis(:,i)'*orthogonal_basis(:,i))
-				u(i+1,k) = (basis(:,k)'*orthogonal_basis(:,i+1))/(orthogonal_basis(:,i+1)'*orthogonal_basis(:,i+1))
-			endfor
-			if(abs(u(i,i+1))>0.5)
-				[basis,u] = reduce(i+1,basis,u)
-			endif
+			basis(:,i+1) = temp
+			[U,mu]= gram_schmidt(basis)
+			[basis,mu] = size_reduce(basis,mu,i+1)
 			i = max(i-1,1)
+	
 		endif
 	endwhile
-	reduced_basis = basis
+	reduced_basis=basis
 endfunction
 
-function [r_basis,u] = reduce(i,basis,u)
-	j = i-1
-	while(j>0)
-		basis(:,i) = basis(:,i) - round(u(j,i))*basis(:,j)
-		u(:,i) = u(:,i) - round(u(j,i))*u(:,j)
-		j = j-1
-	endwhile
-	r_basis = basis
-endfunction
-
-
-
+function decision = lovasz_condition(b1,b2,mu12)
+	decision = 0
+	if(0.75*(b1'*b1)<=(mu12*b1+b2)'*(mu12*b1+b2))
+		decision = 1 
+	endif
+	endfunction

@@ -2,6 +2,7 @@ import sys
 load("attacks/wieners.sage")
 load("attacks/common_modulus_attack.sage")
 load("attacks/partial_message_exposure.sage")
+load("attacks/coppersmith_univariate.sage")
 
 class Daedalus():
 	def __init__(self):

@@ -1,34 +1,52 @@
 import sys
 load("attacks/wieners.sage")
 load("attacks/common_modulus_attack.sage")
+load("attacks/partial_message_exposure.sage")
 
 class Daedalus():
 	def __init__(self):
 		self.n = None
 		self.e = None 
-		self.d = None 
+		self.d = None
+		self.ciphertext = None
+		self.knowntext = None
 		self.results = None
 		self.errors  = None
 
-	def print_pub_key(self):
-		print self.n
-		print self.e
+	def load_ciphertext(self, args, option):
+		if(option == 'file'):
+			f = open(args,"r")
+			self.ciphertext = int(f.readline())
+			f.close()
+		else:
+			self.ciphertext = args
 
 	def loadpubkey(self, args, option):
 		if(option == "file"):
 			f = open(args, 'r')
 			self.n = int(f.readline())
 			self.e = int(f.readline())
+			f.close()
 		else:
 			self.n = args[0]
 			self.e = args[1]
 	
-	def loadprivkey(self, args, type=None):
-		if (type == 'file'):
+	def loadprivkey(self, args, option):
+		if (option == 'file'):
 			f = open(args, 'r')
 			self.d = int(f.readline())
+			f.close()
 		else:
 			self.d = args[0]
+	
+	def load_known_plaintext(self, args, option):
+		if(option == 'file'):
+			f = open(args,"r")
+			self.knowntext = int(f.readline())
+			f.close()
+		else:
+			self.knowntext = args
+	
 	def attack(self, code):
 		if code == 'wieners':
 			out = wieners_attack({'N':self.n,'e':self.e})
@@ -43,6 +61,12 @@ class Daedalus():
 			print "errors" ,
 			print out['errors']
 			#Do Something
+		elif code == "partial_message_exposed":
+			out = partial_message_exposure({'N':self.n, 'e':self.e, 'known_plaintext':self.knowntext, 'C':self.ciphertext})
+			print "results - "
+			print out['results']
+			print "Errors"
+			print out['errors']
 
 def shell():
 	entered = ''
@@ -58,7 +82,6 @@ Command                      		Purpose
 help attacks                 		List all supported attacks
 r = Daedalus()               		Create new instance of Daedalus
 r.loadpubkey((n,e,),"number")         	Load pubkey as (n,e,)
-r.loadpubkey(filename, "file")         	Load pubkey as (n,e,)
 r.loadpubkey(path, 'file')  	 	Load pubkey from file
 r.loadprivkey((d,))          		Load privkey as (d,)
 r.loadprivkey(path)          		Load privkey from file

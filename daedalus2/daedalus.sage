@@ -2,6 +2,7 @@ import sys
 load("attacks/wieners.sage")
 load("attacks/common_modulus_attack.sage")
 load("attacks/partial_message_exposure.sage")
+load("attacks/partial_key_exposure.sage")
 load("attacks/coppersmith_univariate.sage")
 
 class Daedalus():
@@ -11,6 +12,7 @@ class Daedalus():
 		self.d = None
 		self.ciphertext = None
 		self.knowntext = None
+		self.qbar = None
 		self.results = None
 		self.errors  = None
 
@@ -21,6 +23,13 @@ class Daedalus():
 			f.close()
 		else:
 			self.ciphertext = args
+	def load_partial_key(self, args, option):
+		if(option == 'file'):
+			f = open(args,"r")
+			self.qbar = int(f.readline())
+			f.close()
+		else:
+			self.qbar = args
 
 	def loadpubkey(self, args, option):
 		if(option == "file"):
@@ -62,8 +71,14 @@ class Daedalus():
 			print "errors" ,
 			print out['errors']
 			#Do Something
-		elif code == "partial_message_exposed":
+		elif code == "partial_message_exposure":
 			out = partial_message_exposure({'N':self.n, 'e':self.e, 'known_plaintext':self.knowntext, 'C':self.ciphertext})
+			print "results - "
+			print out['results']
+			print "Errors"
+			print out['errors']
+		elif code == "partial_key_exposure":
+			out = partial_key_exposure({'N':self.n, 'qbar':self.qbar})
 			print "results - "
 			print out['results']
 			print "Errors"
